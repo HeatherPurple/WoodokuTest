@@ -1,0 +1,34 @@
+{
+    "name": "PlayerInput",
+    "maps": [
+        {
+            "name": "UI",
+            "id": "2f5299a8-9e80-4a71-a6dd-c5f020bb4402",
+            "actions": [
+                {
+                    "name": "DragInput",
+                    "type": "Button",
+                    "id": "344f22ff-c98e-4d09-bf55-0920b2433346",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "331fc419-788d-4688-84c4-2924bc46feed",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DragInput",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
