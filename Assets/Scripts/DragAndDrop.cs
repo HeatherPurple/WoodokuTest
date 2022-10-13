@@ -8,8 +8,9 @@ public class DragAndDrop : MonoBehaviour, IDragHandler, IDropHandler
 {
     private RectTransform draggingObjectRectTransform;
 
-    [SerializeField]private GameObject currentCell;
-    private GameObject currentPossibleCell;
+    [SerializeField]private GameObject currentPocket;
+
+    private List<GameObject> currentCells = new List<GameObject>();
 
     private void Awake()
     {
@@ -18,12 +19,14 @@ public class DragAndDrop : MonoBehaviour, IDragHandler, IDropHandler
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        currentPossibleCell = collision.gameObject;
+        collision.GetComponent<Cell>().MarkCell(true);
+        currentCells.Add(collision.gameObject);
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        currentPossibleCell = null;
+        collision.GetComponent<Cell>().MarkCell(false);
+        currentCells.Remove(collision.gameObject);
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -39,23 +42,42 @@ public class DragAndDrop : MonoBehaviour, IDragHandler, IDropHandler
     {
         if (eventData.pointerDrag != null)
         {
-            ChangeCurrentCell();
+            PlaceFigure();
         }
         
     }
 
-    private void CheckIfCellIsFree(GameObject cell)
+    private void PlaceFigure()
     {
-        
-    }
-
-    private void ChangeCurrentCell()
-    {
-        if (currentPossibleCell != null)
+        if (FigureCanBePlaced())
         {
-            currentCell = currentPossibleCell;
-            currentPossibleCell = null;
+            foreach (var cell in currentCells)
+            {
+                cell.GetComponent<Cell>().ChangeCellState();
+            }
+            Destroy(gameObject);
         }
-        draggingObjectRectTransform.position = currentCell.transform.position;
+        draggingObjectRectTransform.position = currentPocket.transform.position;
+    }
+
+    private bool FigureCanBePlaced()
+    {
+        if (currentCells.Count <= 0)
+        {
+            return false;
+        }
+        if (currentCells.Count != transform.childCount)
+        {
+            return false;
+        }
+
+        foreach (var cell in currentCells)
+        {
+            if (cell.GetComponent<Cell>().CellState == CellStateEnum.full)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 }
