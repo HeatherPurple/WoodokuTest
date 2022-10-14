@@ -1,43 +1,40 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Cell : MonoBehaviour
 {
-    [SerializeField] public int row;
-    [SerializeField] public int column;
-    [SerializeField] public CellStateEnum cellState; 
-
-    private Image image;
+    [SerializeField] private CellStateEnum cellState; 
     [SerializeField] private Sprite emptySprite;
     [SerializeField] private Sprite fullSprite;
 
+    private Image image;
+
+    public int row;
+    public int column;
+
     public CellStateEnum CellState { get; private set; }
 
+    #region MONO
     private void Awake()
     {
         image = GetComponent<Image>();
-        
     }
 
     private void Start()
     {
-        if (cellState == CellStateEnum.full)
-        {
-            ChangeCellState();
-        }
+        ChangeCellState(cellState);
     }
+    #endregion
 
-    public void ChangeCellState()
+    public void ChangeCellState(CellStateEnum state)
     {
-        if (CellState == CellStateEnum.empty)
+        if (state == CellStateEnum.empty)
         {
-            CellState = CellStateEnum.full;
+            CellState = CellStateEnum.empty;
         }
         else
         {
-            CellState = CellStateEnum.empty;
+            CellState = CellStateEnum.full;
         }
         UpdateCellImage();
     }

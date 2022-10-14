@@ -1,23 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Audio;
-using UnityEngine.UI;
 using TMPro;
 
 public class MainMenu : MonoBehaviour
 {
-    [SerializeField] AudioMixer musicMixer;
-    [SerializeField] Slider slider;
-    [SerializeField] TextMeshProUGUI text;
-    [SerializeField] GameObject retryPanel;
-    [SerializeField] TextMeshProUGUI retryText;
+    [SerializeField] private GameObject retryPanel;
+    [SerializeField] private TextMeshProUGUI retryText;
+    private int movesLeft = 1;
+
+    public int Score { get; set; }
 
     public static MainMenu instance;
 
-    public int score = 0;
-
+    #region MONO
     private void Awake()
     {
         if (instance == null)
@@ -30,55 +25,34 @@ public class MainMenu : MonoBehaviour
             Destroy(gameObject);
         }
     }
+    #endregion
 
-    private void Start()
-    {
-        ChangeMusicVolume(PlayerPrefs.GetFloat("Volume1"));
-    }
-
-    public void ChangeMusicVolume(float vol)
-    {
-        musicMixer.SetFloat("MusicVolume", Mathf.Log10(vol)*20);
-        UpdateMusicText();
-        PlayerPrefs.SetFloat("Volume1", vol);
-    }
-
-    public void UpdateMusicSlider()
-    {
-        float currentVolume;
-        musicMixer.GetFloat("MusicVolume", out currentVolume);
-        slider.value = Mathf.Pow(10,currentVolume/20);
-    }
-
-    public void UpdateMusicText()
-    {
-        float currentVolume;
-        musicMixer.GetFloat("MusicVolume", out currentVolume);
-        text.text = "«¬” : "+ Mathf.Round(Mathf.Pow(10, currentVolume / 20) * 100) +"%";
-    }
 
     public void Retry(string text)
     {
-        score = 0;
+        Score = 0;
         retryPanel.SetActive(true);
         retryText.text = text;
     }
 
+    public void DecreaseMoves()
+    {
+        movesLeft -= 1;
 
-    //private void Awake()
-    //{
-    //    if (instance == null)
-    //    {
-    //        instance = this;
-    //    }
-    //    else if (instance != this)
-    //    {
-    //        Destroy(gameObject);
-    //    }
-
-    //    DontDestroyOnLoad(gameObject);
-
-    //}
+        if (movesLeft <= 0)
+        {
+            string text;
+            if (Score > 0)
+            {
+                text = "œŒ¡≈ƒ¿";
+            }
+            else
+            {
+                text = "Œÿ»¡ ¿";
+            }
+            Retry(text);
+        }
+    }
 
     public void LoadNextLevel(int buildIndex)
     {
