@@ -5,11 +5,13 @@ using UnityEngine.UI;
 
 public class Cell : MonoBehaviour
 {
-    [SerializeField]public int row;  
-    [SerializeField]public int column; 
-    [SerializeField]public CellStateEnum cellState; 
+    [SerializeField] public int row;
+    [SerializeField] public int column;
+    [SerializeField] public CellStateEnum cellState; 
 
     private Image image;
+    [SerializeField] private Sprite emptySprite;
+    [SerializeField] private Sprite fullSprite;
 
     public CellStateEnum CellState { get; private set; }
 
@@ -40,32 +42,15 @@ public class Cell : MonoBehaviour
         UpdateCellImage();
     }
 
-    public void MarkCell(bool isMarked)
-    {
-        if (CellState == CellStateEnum.full)
-        {
-            return;
-        }
-
-        if (isMarked)
-        {
-            image.color = Color.yellow;
-        }
-        else
-        {
-            image.color = Color.white;
-        }
-    }
-
     private void UpdateCellImage()
     {
         if (CellState == CellStateEnum.empty)
         {
-            image.color = Color.white;
+            image.sprite = emptySprite;
         }
         else
         {
-            image.color = Color.grey;
+            image.sprite = fullSprite;
         }
     }
 

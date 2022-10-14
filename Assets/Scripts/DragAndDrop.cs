@@ -105,6 +105,7 @@ public class DragAndDrop : MonoBehaviour, IDragHandler, IDropHandler
 
             Destroy(gameObject);
         }
+        draggingObjectRectTransform.position = currentPocket.transform.position;
     }
 
     private void NextTurn()

@@ -31,10 +31,16 @@ public class MainMenu : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        ChangeMusicVolume(PlayerPrefs.GetFloat("Volume1"));
+    }
+
     public void ChangeMusicVolume(float vol)
     {
         musicMixer.SetFloat("MusicVolume", Mathf.Log10(vol)*20);
         UpdateMusicText();
+        PlayerPrefs.SetFloat("Volume1", vol);
     }
 
     public void UpdateMusicSlider()
@@ -48,7 +54,7 @@ public class MainMenu : MonoBehaviour
     {
         float currentVolume;
         musicMixer.GetFloat("MusicVolume", out currentVolume);
-        text.text = "«‚ÛÍ: "+ Mathf.Round(Mathf.Pow(10, currentVolume / 20) * 100) +"%";
+        text.text = "«¬” : "+ Mathf.Round(Mathf.Pow(10, currentVolume / 20) * 100) +"%";
     }
 
     public void Retry(string text)
