@@ -37,13 +37,17 @@ public class GridController : MonoBehaviour
     public void UpdateGrid(List<Cell> newCells)
     {
         HashSet<int> uniqueRows = GetUniqueRows(newCells);
-        HashSet<int> uniqueColumns = GetUniqueColumns(newCells);
+        //HashSet<int> uniqueColumns = GetUniqueColumns(newCells);
 
         List<List<Cell>> cellsToClean1 = GetCellsFromRows(uniqueRows);
-        List<List<Cell>> cellsToClean2 = GetCellsFromColumns(uniqueColumns);
+        //List<List<Cell>> cellsToClean2 = GetCellsFromColumns(uniqueColumns);
 
+        for (int i = 0; i < cellsToClean1.Count; i++)
+        {
+            MainMenu.instance.score += 1;
+        }
         cellsToClean1.ForEach(l => l.ForEach(c => c.ChangeCellState()));
-        cellsToClean2.ForEach(l => l.ForEach(c => c.ChangeCellState()));
+        //cellsToClean2.ForEach(l => l.ForEach(c => c.ChangeCellState()));
     }
 
     private HashSet<int> GetUniqueRows(List<Cell> cells)
@@ -58,17 +62,17 @@ public class GridController : MonoBehaviour
         return rows;
     }
 
-    private HashSet<int> GetUniqueColumns(List<Cell> cells)
-    {
-        HashSet<int> columns = new HashSet<int>();
+    //private HashSet<int> GetUniqueColumns(List<Cell> cells)
+    //{
+    //    HashSet<int> columns = new HashSet<int>();
 
-        foreach (var cell in cells)
-        {
-            columns.Add(cell.column);
-        }
+    //    foreach (var cell in cells)
+    //    {
+    //        columns.Add(cell.column);
+    //    }
 
-        return columns;
-    }
+    //    return columns;
+    //}
 
     private List<List<Cell>> GetCellsFromRows(HashSet<int> rows)
     {
@@ -96,31 +100,31 @@ public class GridController : MonoBehaviour
         return cellsToClean;
     }
 
-    private List<List<Cell>> GetCellsFromColumns(HashSet<int> columns)
-    {
-        List<List<Cell>> cellsToClean = new List<List<Cell>>();
+    //private List<List<Cell>> GetCellsFromColumns(HashSet<int> columns)
+    //{
+    //    List<List<Cell>> cellsToClean = new List<List<Cell>>();
 
-        foreach (var columnNumber in columns)
-        {
-            List<Cell> newColumn = new List<Cell>();
-            bool newColumnIsFull = true;
+    //    foreach (var columnNumber in columns)
+    //    {
+    //        List<Cell> newColumn = new List<Cell>();
+    //        bool newColumnIsFull = true;
 
-            for (int i = 0; i < cells1.Length; i++)
-            {
-                if (cells1[i].subArray[columnNumber - 1].CellState == CellStateEnum.empty)
-                {
-                    newColumnIsFull = false;
-                    break;
-                }
-                newColumn.Add(cells1[i].subArray[columnNumber - 1]);
-            }
-            if (newColumnIsFull)
-            {
-                cellsToClean.Add(newColumn);
-            }
-        }
-        return cellsToClean;
-    }
+    //        for (int i = 0; i < cells1.Length; i++)
+    //        {
+    //            if (cells1[i].subArray[columnNumber - 1].CellState == CellStateEnum.empty)
+    //            {
+    //                newColumnIsFull = false;
+    //                break;
+    //            }
+    //            newColumn.Add(cells1[i].subArray[columnNumber - 1]);
+    //        }
+    //        if (newColumnIsFull)
+    //        {
+    //            cellsToClean.Add(newColumn);
+    //        }
+    //    }
+    //    return cellsToClean;
+    //}
 
 
 

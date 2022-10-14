@@ -12,12 +12,17 @@ public class BoolSubArray
 public class DragAndDrop : MonoBehaviour, IDragHandler, IDropHandler
 {
     private RectTransform draggingObjectRectTransform;
-    [SerializeField]private GameObject currentPocket;
+    [SerializeField]private Pocket currentPocket;
 
     [SerializeField] private Cell targetCell;
+    [SerializeField] private Pocket targetPocket;
+
     [SerializeField] public BoolSubArray[] cells;
 
     [SerializeField] private GridController gridController;
+
+    private static int movesLeft = 1;
+
 
     private void Awake()
     {
@@ -26,12 +31,34 @@ public class DragAndDrop : MonoBehaviour, IDragHandler, IDropHandler
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        targetCell = collision.GetComponent<Cell>();
+        Cell cell = new Cell();
+        if (collision.TryGetComponent(out cell))
+        {
+            targetCell = cell;
+            return;
+        }
+
+        Pocket pocket = new Pocket();
+        if (collision.TryGetComponent(out pocket))
+        {
+            targetPocket = pocket;
+        }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        targetCell = null;
+        Cell cell = new Cell();
+        if (collision.TryGetComponent(out cell))
+        {
+            targetCell = null;
+            return;
+        }
+
+        Pocket pocket = new Pocket();
+        if (collision.TryGetComponent(out pocket))
+        {
+            targetPocket = null;
+        }
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -51,10 +78,20 @@ public class DragAndDrop : MonoBehaviour, IDragHandler, IDropHandler
         }
     }
 
+    
+
     private void PlaceFigure()
     {
+        if (targetPocket != null)
+        {
+            currentPocket = targetPocket;
+            draggingObjectRectTransform.position = currentPocket.transform.position;
+            return;
+        }
+
         if (targetCell == null)
         {
+            draggingObjectRectTransform.position = currentPocket.transform.position;
             return;
         }
 
@@ -64,9 +101,29 @@ public class DragAndDrop : MonoBehaviour, IDragHandler, IDropHandler
             list.ForEach(c => c.ChangeCellState());
             gridController.UpdateGrid(list);
 
+            NextTurn();
+
             Destroy(gameObject);
         }
-        draggingObjectRectTransform.position = currentPocket.transform.position;
+    }
+
+    private void NextTurn()
+    {
+        movesLeft -= 1;
+
+        if (movesLeft <= 0)
+        {
+            string text;
+            if (MainMenu.instance.score > 0)
+            {
+                text = "онаедю";
+            }
+            else
+            {
+                text = "ньхайю";
+            }
+            MainMenu.instance.Retry(text);
+        }
     }
 
     private bool FigureCanBePlaced(out List<Cell> list)

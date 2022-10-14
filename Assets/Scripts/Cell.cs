@@ -7,7 +7,7 @@ public class Cell : MonoBehaviour
 {
     [SerializeField]public int row;  
     [SerializeField]public int column; 
-    [SerializeField]public int block;
+    [SerializeField]public CellStateEnum cellState; 
 
     private Image image;
 
@@ -16,6 +16,15 @@ public class Cell : MonoBehaviour
     private void Awake()
     {
         image = GetComponent<Image>();
+        
+    }
+
+    private void Start()
+    {
+        if (cellState == CellStateEnum.full)
+        {
+            ChangeCellState();
+        }
     }
 
     public void ChangeCellState()
