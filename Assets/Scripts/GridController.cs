@@ -2,97 +2,125 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
+public class CellSubArray
+{
+    public Cell[] subArray;
+    public CellSubArray(int arraySize)
+    {
+        subArray = new Cell[arraySize];
+    }
+
+}
+
 public class GridController : MonoBehaviour
 {
-    [SerializeField] private int cellCount = 81;
-
-    [SerializeField] private List<Cell> cells = new();
-    //[SerializeField] private Cell[,] cells1;
+    [SerializeField] public CellSubArray[] cells1;
 
     private void Awake()
     {
-        for (int i = 0; i < cellCount; i++)
+        int arraySize = (int)Mathf.Sqrt(transform.childCount);
+        
+        cells1 = new CellSubArray[arraySize];
+        for (int i = 0; i < cells1.Length; i++)
         {
-            cells.Add(transform.GetChild(i).GetComponent<Cell>());
-            
+            cells1[i] = new CellSubArray(arraySize);
+        }
+
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            Cell cell = transform.GetChild(i).GetComponent<Cell>();
+            cells1[cell.row - 1].subArray[cell.column - 1] = cell;
         }
     }
 
-    public void UpdateGrid(Cell cell)
+    public void UpdateGrid(List<Cell> newCells)
     {
-        CleanArea(cell);
+        HashSet<int> uniqueRows = GetUniqueRows(newCells);
+        HashSet<int> uniqueColumns = GetUniqueColumns(newCells);
 
+        List<List<Cell>> cellsToClean1 = GetCellsFromRows(uniqueRows);
+        List<List<Cell>> cellsToClean2 = GetCellsFromColumns(uniqueColumns);
+
+        cellsToClean1.ForEach(l => l.ForEach(c => c.ChangeCellState()));
+        cellsToClean2.ForEach(l => l.ForEach(c => c.ChangeCellState()));
     }
 
-    private void CleanArea(Cell cell)
+    private HashSet<int> GetUniqueRows(List<Cell> cells)
     {
-        List<Cell> row = new List<Cell>();
-        List<Cell> column = new List<Cell>();
-        List<Cell> block = new List<Cell>();
+        HashSet<int> rows = new HashSet<int>();
 
-        foreach (var c in cells)
+        foreach (var cell in cells)
         {
-            if (c.row == cell.row)
-            {
-                row.Add(c);
-            }
-            if (c.column == cell.column)
-            {
-                column.Add(c);
-            }
-            if (c.block == cell.block)
-            {
-                block.Add(c);
-            }
+            rows.Add(cell.row);
         }
 
-        bool rowIsFull = true;
-        bool columnIsFull = true;
-        bool blockIsFull = true;
-
-        foreach (var c in row)
-        {
-            if (c.CellState == CellStateEnum.empty)
-            {
-                rowIsFull = false;
-                break;
-            }
-        }
-
-        foreach (var c in column)
-        {
-            if (c.CellState == CellStateEnum.empty)
-            {
-                columnIsFull = false;
-                break;
-            }
-        }
-
-        foreach (var c in block)
-        {
-            if (c.CellState == CellStateEnum.empty)
-            {
-                blockIsFull = false;
-                break;
-            }
-        }
-
-        if (rowIsFull)
-        {
-            row.ForEach(c => c.ChangeCellState());
-        }
-        if (columnIsFull)
-        {
-            column.ForEach(c => c.ChangeCellState());
-        }
-        if (blockIsFull)
-        {
-            block.ForEach(c => c.ChangeCellState());
-        }
+        return rows;
     }
 
-  
+    private HashSet<int> GetUniqueColumns(List<Cell> cells)
+    {
+        HashSet<int> columns = new HashSet<int>();
 
+        foreach (var cell in cells)
+        {
+            columns.Add(cell.column);
+        }
+
+        return columns;
+    }
+
+    private List<List<Cell>> GetCellsFromRows(HashSet<int> rows)
+    {
+        List<List<Cell>> cellsToClean = new List<List<Cell>>();
+
+        foreach (var rowNumber in rows)
+        {
+            List<Cell> newRow = new List<Cell>();
+            bool newRowIsFull = true;
+
+            for (int i = 0; i < cells1[rowNumber - 1].subArray.Length; i++)
+            {
+                if (cells1[rowNumber - 1].subArray[i].CellState == CellStateEnum.empty)
+                {
+                    newRowIsFull = false;
+                    break;
+                }
+                newRow.Add(cells1[rowNumber - 1].subArray[i]);
+            }
+            if (newRowIsFull)
+            {
+                cellsToClean.Add(newRow);
+            }
+        }
+        return cellsToClean;
+    }
+
+    private List<List<Cell>> GetCellsFromColumns(HashSet<int> columns)
+    {
+        List<List<Cell>> cellsToClean = new List<List<Cell>>();
+
+        foreach (var columnNumber in columns)
+        {
+            List<Cell> newColumn = new List<Cell>();
+            bool newColumnIsFull = true;
+
+            for (int i = 0; i < cells1.Length; i++)
+            {
+                if (cells1[i].subArray[columnNumber - 1].CellState == CellStateEnum.empty)
+                {
+                    newColumnIsFull = false;
+                    break;
+                }
+                newColumn.Add(cells1[i].subArray[columnNumber - 1]);
+            }
+            if (newColumnIsFull)
+            {
+                cellsToClean.Add(newColumn);
+            }
+        }
+        return cellsToClean;
+    }
 
 
 

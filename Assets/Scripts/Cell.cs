@@ -5,20 +5,17 @@ using UnityEngine.UI;
 
 public class Cell : MonoBehaviour
 {
-    [SerializeField]public int id; //change 
     [SerializeField]public int row;  
     [SerializeField]public int column; 
     [SerializeField]public int block;
 
     private Image image;
-    private GridController gridController;
 
     public CellStateEnum CellState { get; private set; }
 
     private void Awake()
     {
         image = GetComponent<Image>();
-        gridController = transform.parent.GetComponent<GridController>();
     }
 
     public void ChangeCellState()
@@ -26,14 +23,12 @@ public class Cell : MonoBehaviour
         if (CellState == CellStateEnum.empty)
         {
             CellState = CellStateEnum.full;
-            gridController.UpdateGrid(this);
         }
         else
         {
             CellState = CellStateEnum.empty;
         }
         UpdateCellImage();
-        
     }
 
     public void MarkCell(bool isMarked)

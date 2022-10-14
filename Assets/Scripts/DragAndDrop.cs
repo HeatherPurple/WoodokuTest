@@ -3,14 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+[System.Serializable]
+public class BoolSubArray
+{
+    public CellStateEnum[] subArray;
+}
 
 public class DragAndDrop : MonoBehaviour, IDragHandler, IDropHandler
 {
     private RectTransform draggingObjectRectTransform;
-
     [SerializeField]private GameObject currentPocket;
 
-    private List<GameObject> currentCells = new List<GameObject>();
+    [SerializeField] private Cell targetCell;
+    [SerializeField] public BoolSubArray[] cells;
+
+    [SerializeField] private GridController gridController;
 
     private void Awake()
     {
@@ -19,14 +26,12 @@ public class DragAndDrop : MonoBehaviour, IDragHandler, IDropHandler
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        collision.GetComponent<Cell>().MarkCell(true);
-        currentCells.Add(collision.gameObject);
+        targetCell = collision.GetComponent<Cell>();
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        collision.GetComponent<Cell>().MarkCell(false);
-        currentCells.Remove(collision.gameObject);
+        targetCell = null;
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -44,38 +49,49 @@ public class DragAndDrop : MonoBehaviour, IDragHandler, IDropHandler
         {
             PlaceFigure();
         }
-        
     }
 
     private void PlaceFigure()
     {
-        if (FigureCanBePlaced())
+        if (targetCell == null)
         {
-            foreach (var cell in currentCells)
-            {
-                cell.GetComponent<Cell>().ChangeCellState();
-            }
+            return;
+        }
+
+        List<Cell> list;
+        if (FigureCanBePlaced(out list))
+        {
+            list.ForEach(c => c.ChangeCellState());
+            gridController.UpdateGrid(list);
+
             Destroy(gameObject);
         }
         draggingObjectRectTransform.position = currentPocket.transform.position;
     }
 
-    private bool FigureCanBePlaced()
+    private bool FigureCanBePlaced(out List<Cell> list)
     {
-        if (currentCells.Count <= 0)
+        list = new List<Cell>();
+        for (int i = 0; i < cells.Length; i++)
         {
-            return false;
-        }
-        if (currentCells.Count != transform.childCount)
-        {
-            return false;
-        }
-
-        foreach (var cell in currentCells)
-        {
-            if (cell.GetComponent<Cell>().CellState == CellStateEnum.full)
+            for (int j = 0; j < cells[i].subArray.Length; j++)
             {
-                return false;
+                if (cells[i].subArray[j] == CellStateEnum.full)
+                {
+                    if (targetCell.row - 1 + i >= gridController.cells1.Length ||
+                        targetCell.column - 1 + j >= gridController.cells1[i].subArray.Length)
+                    {
+                        return false;
+                    }
+
+                    Cell currentCell = gridController.cells1[targetCell.row - 1 + i]
+                        .subArray[targetCell.column - 1 + j];
+                    if (currentCell.CellState == CellStateEnum.full)
+                    {
+                        return false;
+                    }
+                    list.Add(currentCell);
+                }
             }
         }
         return true;
